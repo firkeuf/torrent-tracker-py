@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 import models
@@ -8,7 +8,7 @@ from lib.exporters.seven import seven
 from lib.exporters.solidtorrents import solidtorrents
 from lib.exporters.torrentcsv import torrentcsv
 from lib.exporters.torrentgalaxy import torrentgalaxy
-from lib.get_hotpicks import get_hotpicks
+from lib.get_hotpicks import get_hotpicks, get_feed
 from lib.get_magnetlink import get_magnetlink
 
 app = FastAPI()
@@ -34,7 +34,8 @@ def new_movies(cat: int = None):
     if cat:
         movies = get_hotpicks(f'https://torrentgalaxy.to/torrents-hotpicks.php?cat={cat}')
         key = "movies" if cat == 1 else "fourKMovies"
-        return {"refresh": True, key: movies}
+        return Response(content=get_feed(movies), media_type="application/xml" )
+
     else:
         movies = get_hotpicks('https://torrentgalaxy.to/torrents-hotpicks.php?cat=1')
         four_k_movies = get_hotpicks('https://torrentgalaxy.to/torrents-hotpicks.php?cat=2')
